@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}이미지 — 몽유록{% endblock %}
+{% block description %}대화를 통해 생성된 이미지 내역을 모아서 확인하세요.{% endblock %}
+
+{% block content %}
+<section class="images">
+  <header class="images__header">
+    <h1>{{ page_title }}</h1>
+    <p>{{ page_description }}</p>
+  </header>
+
+  {% if images %}
+    <ul class="images__grid">
+      {% for img in images %}
+        <li class="images__item">
+          <button type="button"
+                  class="images__card"
+                  data-lightbox
+                  data-src="{{ img.display_url }}"
+                  data-title="{{ img.title }}"
+                  data-created="{{ img.created_at|date:'Y-m-d H:i' }}"
+                  aria-label="{{ img.title }} 크게 보기">
+            <img src="{{ img.display_url }}"
+                 alt="{{ img.title }}"
+                 loading="lazy"
+                 width="512" height="512" />
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if is_paginated %}
+      <nav class="pager" aria-label="페이지네이션">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">이전</a>
+        {% endif %}
+        <span>{{ page_obj.number }} / {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">다음</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <p class="images__empty">아직 생성된 이미지가 없습니다.</p>
+  {% endif %}
+</section>
+
+<div id="lightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-label="이미지 크게 보기">
+  <button type="button" class="lightbox__close" aria-label="닫기">×</button>
+  <figure class="lightbox__figure" onclick="event.stopPropagation()">
+    <img class="lightbox__img" alt="" />
+    <figcaption class="lightbox__caption">
+      <span class="lightbox__title"></span>
+      <span class="lightbox__date"></span>
+    </figcaption>
+  </figure>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script src="{% static 'images/js/lightbox.js' %}" defer></script>
+{% endblock %}
