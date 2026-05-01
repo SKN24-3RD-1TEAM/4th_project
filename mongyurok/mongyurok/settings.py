@@ -37,12 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.main',
-    'apps.accounts',
+    'apps.auths',
+    'apps.scenarios',
     'apps.characters',
-    'apps.stories',
-    'apps.chats',
-    'apps.images'
+    'apps.users',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'mongyurok.urls'
+ROOT_URLCONF = 'apps.characters.urls'
 
 TEMPLATES = [
     {
@@ -82,8 +80,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'dream_db',
-        'USER' : 'admin',
-        'PASSWORD' : 'admin', 
+        'USER' : 'root',
+        'PASSWORD' : '1234', 
         'HOST' : '127.0.0.1',
         'PORT' : '3306',
         'OPTIONS': {
@@ -128,3 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]

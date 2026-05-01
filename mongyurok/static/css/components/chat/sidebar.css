@@ -1,0 +1,11 @@
+.ham{
+    background-color: black;
+    width: 320px;
+    height: 100vh;
+}
+
+.ham-slide-btn{
+    background-color: aqua;
+    width: 100px;
+    height: 100px;
+}
