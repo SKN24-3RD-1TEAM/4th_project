@@ -19,10 +19,9 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", include('apps.main.urls'))
-    path('accounts/', include('apps.accounts.urls')),
-    path('characters/', include('apps.characters.urls')),
-    path('stories/', include('apps.stories.urls')),
-    path('chats/', include('apps.chats.urls')),
-    path('images/', include('apps.images.urls'))
+    path("", include('apps.characters.urls')),
+    path('auths/', include('apps.auths.urls')),
+    path('scenarios/', include('apps.scenarios.urls')),
+    path('users/', include('apps.users.urls')),
+    path('characters/', include('apps.characters.urls'))
 ]
