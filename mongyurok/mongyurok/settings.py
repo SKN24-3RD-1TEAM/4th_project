@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'apps.characters.urls'
+ROOT_URLCONF = 'mongyurok.urls'
 
 TEMPLATES = [
     {

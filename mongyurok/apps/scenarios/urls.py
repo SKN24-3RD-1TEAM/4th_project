@@ -5,7 +5,7 @@ app_name = "scenarios"
 
 urlpatterns = [
     # GET /scenes/ : 전체 시나리오 목록 조회
-    path("", views.scene_list, name="scene_list"), 
+    path("", views.main_scenarios, name="main_scenarios"), 
     
     # GET /scenes/1/ : 특정 시나리오 상세 조회
     path("<int:scene_id>/", views.scene_detail, name="scene_detail"), 

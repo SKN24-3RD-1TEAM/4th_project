@@ -1,11 +1,13 @@
 {% load static %}
 <header>
     <div class="header-left">
-        <a href="{% url 'main' %}" class="logo">몽유록</a>
+        <a href="{% url 'characters:main' %}" class="logo">몽유록</a>
 
         <nav>
-            <a href="#">독대 모드</a>
-            <a href="#">스토리 모드</a>
+            <a href="{% url 'characters:main' %}"
+            class="nav-link {% if request.resolver_match.view_name == 'characters:main' %}active{% endif %}">독대 모드</a>
+            <a href="{% url 'scenarios:main_scenarios' %}"
+            class="nav-link {% if request.resolver_match.view_name == 'scenarios:main_scenarios' %}active{% endif %}">스토리 모드</a>
             <a href="#">이미지</a>
         </nav>
     </div>
@@ -17,7 +19,7 @@
         </div>
         <div class="login-box">
             <div class="header-profile">
-                <a href=""></a>
+                <a href="{% url 'auths:login' %}"></a>
             </div>
             <div class="header-hover">
                 <div>마이페이지</div>

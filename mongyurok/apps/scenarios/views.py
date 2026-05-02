@@ -4,9 +4,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from asgiref.sync import sync_to_async
-
 from .models import SceneModeInfo, SceneRoomSetting, SceneMessage
 from apps.characters.models import Persona
+
+def main_scenarios(request) :
+    return render(request, 'scenarios/main.html')
+
 # 페르소나 모델은 프로젝트 경로에 맞게 수정해주세요
 # from apps.characters.models import Persona 
 
@@ -220,3 +223,4 @@ async def send_chat(request, room_id):
 
     except Exception as e:
         return JsonResponse({"status": "error", "message": "통신 중 오류가 발생했습니다."}, status=500)
+
