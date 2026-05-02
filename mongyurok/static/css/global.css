@@ -39,6 +39,7 @@ body {
     font-weight: 400;
     background-color: #FFF8F0;
     color: #1E2121;
+    height: 100%;
 }
 
 body a {
@@ -48,5 +49,16 @@ body a {
 
 .main-group {
     display: flex;
-    background-color: white;
+    background-color: #FFF8F0;
+    align-items: stretch;
+    min-height: 100vh; 
+    width: 100%;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: #FFF8F0;
 }

@@ -8,6 +8,14 @@ header {
     position: relative;
 }
 
+.nav-link.active {
+    color: #389393;
+}
+.nav-link {
+    color: #1E2121;
+    text-decoration: none;
+}
+
 .header-left, header .header-right {
     display: flex;
     align-items: center;
@@ -76,7 +84,7 @@ header {
 .header-hover {
     display: none;
     cursor: pointer;
-    background-color: #315057;
+    background-color: #1E2121;
     width:100px;
     top: 70px;
     position: absolute;
