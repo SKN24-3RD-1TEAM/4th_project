@@ -104,8 +104,7 @@
                             id="nickname"
                             name="nickname"
                             class="nickname-input"
-                            value=""
-                            placeholder="변경할 닉네임을 입력해주세요"
+                            value="{{ request.user.nickname }}"
                             maxlength="12"
                             data-current-nickname="{{ request.user.nickname }}"
                         >

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}이미지{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/main/img_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="img-list-page">
+    <div class="img-list-inner">
+        <h1 class="img-list-title">이미지</h1>
+        <p class="img-list-desc">이미지를 한눈에 확인해 보세요</p>
+
+        <div class="img-grid">
+            {% for image in image_list %}
+                <div class="img-card">
+                    <img src="{% static image.src %}" alt="{{ image.title }}">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 이미지 확대 모달 -->
+<div class="img-modal" id="imgModal">
+    <div class="img-modal-box">
+        <button class="img-modal-close" type="button" id="imgModalClose">
+            <img src="{% static 'images/icons/close.png' %}" alt="닫기">
+        </button>
+
+        <img class="img-modal-img" id="imgModalImg" src="" alt="">
+    </div>
+</div>
+
+<script>
+    const imgCardImages = document.querySelectorAll('.img-card img');
+    const imgModal = document.getElementById('imgModal');
+    const imgModalImg = document.getElementById('imgModalImg');
+    const imgModalClose = document.getElementById('imgModalClose');
+
+    imgCardImages.forEach((img) => {
+        img.addEventListener('click', () => {
+            imgModalImg.src = img.src;
+            imgModalImg.alt = img.alt;
+            imgModal.classList.add('active');
+        });
+    });
+
+    imgModalClose.addEventListener('click', () => {
+        imgModal.classList.remove('active');
+        imgModalImg.src = '';
+    });
+
+    imgModal.addEventListener('click', (event) => {
+        if (event.target === imgModal) {
+            imgModal.classList.remove('active');
+            imgModalImg.src = '';
+        }
+    });
+</script>
+{% endblock %}
