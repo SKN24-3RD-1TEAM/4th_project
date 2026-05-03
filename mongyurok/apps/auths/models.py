@@ -14,8 +14,8 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.pop('is_superuser', None)
         extra_fields.setdefault('is_admin', True)
-        extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
     
 class User(AbstractBaseUser):
@@ -27,6 +27,8 @@ class User(AbstractBaseUser):
     nickname = models.CharField(max_length=100)
     state = models.IntegerField(default=0)
     login_failed = models.IntegerField(default=0)
+    is_admin = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     img_url = models.ImageField(upload_to='profiles/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -36,6 +38,23 @@ class User(AbstractBaseUser):
         return f"{self.nickname} ({self.email})"
     
     REQUIRED_FIELDS = []
+
+    @property
+    def is_staff(self):
+        return self.is_admin
+
+    @property
+    def is_superuser(self):
+        return self.is_admin
+
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
+
+    def has_module_perms(self, app_label):
+        return self.is_admin
+
+    def __str__(self):
+        return f"{self.nickname} ({self.email})"
 
     class Meta:
         db_table = 'users'

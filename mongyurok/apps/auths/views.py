@@ -49,24 +49,24 @@ def sign_up(request):
         profile_img = request.FILES.get('profile_image')
 
         full_email = f"{email_id}@{domain}"
-    try:
-        if User.objects.filter(email=full_email).exists():
-            return JsonResponse({'status': 'error', 'message': '이미 가입된 이메일입니다'})
-        user = User.objects.create_user(
-            email=full_email,
-            password=password,
-            nickname=nickname,
-            state=1,           # 기본 상태값 (예: 활성 유저)
-            login_failed=0     # 초기 실패 횟수
-        )
+        try:
+            if User.objects.filter(email=full_email).exists():
+                return JsonResponse({'status': 'error', 'message': '이미 가입된 이메일입니다'})
+            user = User.objects.create_user(
+                email=full_email,
+                password=password,
+                nickname=nickname,
+                state=1,           # 기본 상태값 (예: 활성 유저)
+                login_failed=0     # 초기 실패 횟수
+            )
 
-        if profile_img:
-                user.img_url = profile_img  # 장고가 알아서 파일 저장 및 경로 기록
-                user.save()
-        return JsonResponse({'status': 'success', 'message': '회원가입에 성공하였습니다'})
-    except Exception as e:
-        print(f"회원가입 에러: {e}")
-        return JsonResponse({'status': 'error', 'message': f'서버 오류: {str(e)}'})
+            if profile_img:
+                    user.img_url = profile_img  # 장고가 알아서 파일 저장 및 경로 기록
+                    user.save()
+            return JsonResponse({'status': 'success', 'message': '회원가입에 성공하였습니다'})
+        except Exception as e:
+            print(f"회원가입 에러: {e}")
+            return JsonResponse({'status': 'error', 'message': f'서버 오류: {str(e)}'})
 
 def password_find(request):
     return render(request, "auths/find.html")
@@ -134,6 +134,7 @@ def send_verification_code(request):
     except Exception as e:
         # 에러 발생 시 로그를 찍고 에러 응답
         print(f"Error: {e}")
+        return JsonResponse({'status': 'error', 'message': '서버 오류가 발생했습니다.'}, status=500)
 
 def code_confirm(request):
     if request.method == 'POST':
@@ -143,18 +144,18 @@ def code_confirm(request):
         full_email = f"{email_id}@{domain}"
         print(full_email)
 
-    try:
-        verification = EmailVerification.objects.get(email=full_email)
+        try:
+            verification = EmailVerification.objects.get(email=full_email)
 
-        if verification.code == code:
-            verification.is_verified = True
-            verification.save()
-            return JsonResponse({'status': 'success', 'message': '이메일 인증에 성공하였습니다'})
-        else:
-            return JsonResponse({'status': 'error', 'message': '이메일 인증 번호가 맞지 않습니다.'})
-        
-    except EmailVerification.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': '인증 요청 기록이 없습니다.'})
+            if verification.code == code:
+                verification.is_verified = True
+                verification.save()
+                return JsonResponse({'status': 'success', 'message': '이메일 인증에 성공하였습니다'})
+            else:
+                return JsonResponse({'status': 'error', 'message': '이메일 인증 번호가 맞지 않습니다.'})
+
+        except EmailVerification.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': '인증 요청 기록이 없습니다.'})
 
 def logout_view(request):
     logout(request)
