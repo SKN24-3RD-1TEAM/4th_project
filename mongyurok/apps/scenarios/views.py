@@ -10,8 +10,6 @@ from apps.characters.models import Persona
 def main_scenarios(request) :
     return render(request, 'scenarios/main.html')
 
-# 페르소나 모델은 프로젝트 경로에 맞게 수정해주세요
-# from apps.characters.models import Persona 
 
 # =====================================================================
 # 1. 시나리오 목록 및 상세 (SCR-SCENE-01)
@@ -108,7 +106,7 @@ def setup_persona(request, room_id):
         scene_msg = SceneMessage.objects.create(
             user=request.user,
             room=room,
-            type=SceneMessage.MessageType.SITUATION,
+            type=SceneMessage.MessageType.SCENE,
             content=final_first_scene
         )
 
@@ -153,6 +151,10 @@ async def send_chat(request, room_id):
         recent_msgs = list(SceneMessage.objects.filter(room=current_room).order_by('-created_at')[:10])
         history = [{"type": msg.type, "content": msg.content} for msg in reversed(recent_msgs)]
         char_list = [{"name": c.name, "summary": c.summary} for c in scene.chars.all()]
+        current_chapter_obj = scene.chapters.filter(
+        chapter_key=current_room.current_chapter
+        ).first()
+        chapter_context = current_chapter_obj.context_summary if current_chapter_obj else ""
 
         return {
             "user_message": user_text,
@@ -162,6 +164,17 @@ async def send_chat(request, room_id):
                 "summary": scene.summary,
                 "characters": char_list
             },
+            "game_state": {
+                "chapter": current_room.current_chapter,
+                "chapter_context": chapter_context,
+                "time_remaining": current_room.time_remaining,
+                "food": current_room.food,
+                "morale": current_room.morale,
+                "loyalty": current_room.loyalty,
+                "faction_split": current_room.faction_split,
+                "flags": current_room.flags,
+            },
+            "history_summary": current_room.history_summary,
             "history": history
         }
 
@@ -176,6 +189,9 @@ async def send_chat(request, room_id):
             
             ai_data = response.json()
             replies = ai_data.get("replies", [])
+            state_changes = ai_data.get("state_changes", {})
+            chapter_transition = ai_data.get("chapter_transition")
+            history_summary = ai_data.get("history_summary", "")
 
             # 응답받은 여러 개의 메시지를 DB에 각각 저장
             @sync_to_async
@@ -189,7 +205,7 @@ async def send_chat(request, room_id):
                     content = reply.get("content")
 
                     char_obj = None
-                    final_type = SceneMessage.MessageType.SITUATION
+                    final_type = SceneMessage.MessageType.SCENE
                     
                     # 캐릭터 대사인 경우
                     if msg_type == "character":
@@ -213,12 +229,56 @@ async def send_chat(request, room_id):
                     })
                 
                 return saved_msgs
+            
+            @sync_to_async
+            def apply_state_changes(current_room, state_changes, chapter_transition, history_summary):
+                """AI가 반환한 수치 변경값을 room에 반영"""
+
+                # 1. 수치 변경 적용 (delta 방식 — 현재값에 더하는 구조)
+                stat_fields = ["food", "morale", "loyalty", "faction_split", "time_remaining"]
+
+                for field in stat_fields:
+                    if field in state_changes:
+                        current_val = getattr(current_room, field)
+                        delta = state_changes[field]
+                        new_val = current_val + delta
+
+                        # food, morale, loyalty는 0~100 범위로 클램핑
+                        if field in ["food", "morale", "loyalty"]:
+                            new_val = max(0, min(100, new_val))
+
+                        # faction_split은 -100~100 범위
+                        elif field == "faction_split":
+                            new_val = max(-100, min(100, new_val))
+
+                        setattr(current_room, field, new_val)
+
+                # 2. 챕터 전환 처리
+                if chapter_transition:
+                    current_room.current_chapter = chapter_transition
+                    next_chapter = current_room.scene.chapters.filter(chapter_key=chapter_transition).first()
+                    if next_chapter:
+                        SceneMessage.objects.create(
+                            user=current_room.user,
+                            room=current_room,
+                            type=SceneMessage.MessageType.SCENE,
+                            content=f"=== {next_chapter.title} ==="
+                        )
+
+                # 3. history_summary 갱신
+                if history_summary:
+                    current_room.history_summary = history_summary
+
+                current_room.save()
 
             new_messages = await save_ai_replies(room, replies)
+            await apply_state_changes(room, state_changes, chapter_transition, history_summary)
 
             return JsonResponse({
                 "status": "success",
-                "new_messages": new_messages
+                "new_messages": new_messages,
+                "state_changes": state_changes,
+                "chapter_transition": chapter_transition
             })
 
     except Exception as e:
