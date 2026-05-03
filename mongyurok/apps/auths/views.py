@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from .models import EmailVerification
 from django.db.models import F
 from django.shortcuts import render, redirect
+from django.contrib.auth import logout
 
 User = get_user_model()
 
@@ -21,11 +22,11 @@ def login_view(request):
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
-            # 2. 검증 성공! 세션 생성 및 로그인 처리
+
             auth_login(request, user)
             return redirect('characters:main')
         else:
-            # 3. 이메일이 없거나 비밀번호가 틀린 경우 모두 여기서 처리 (보안상 메시지는 동일하게)
+
             return render(request, 'auths/login.html', {
                 'error': '이메일 또는 비밀번호가 틀렸습니다.'
             })
@@ -154,3 +155,7 @@ def code_confirm(request):
         
     except EmailVerification.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': '인증 요청 기록이 없습니다.'})
+
+def logout_view(request):
+    logout(request)
+    return redirect('auths:login')

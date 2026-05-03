@@ -19,12 +19,22 @@
         </div>
         <div class="login-box">
             <div class="header-profile">
-                <a href="{% url 'auths:login' %}">ㅇㄴㄹ</a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'auths:login' %}" class="header-profile">
+                        <p>로그인</p>
+                    </a>
+                {% else %}    
+                    <img src="{{ user.img_url.url }}" alt="내프로필">
+                {% endif %}
+            <div>
+        </div>
             </div>
-            <div class="header-hover">
-                <div>마이페이지</div>
-                <div>로그아웃</div>
-            </div>
+            {% if user.is_authenticated %}
+                <div class="header-hover">
+                    <div>마이페이지</div>
+                    <a href="{% url 'auths:logout' %}">로그아웃</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </header>
