@@ -134,7 +134,6 @@ from asgiref.sync import sync_to_async
 import httpx
 
 @login_required(login_url="auths:login")
-@require_POST
 async def send_message(request, room_id):
     """
     채팅 메시지 비동기 전송
@@ -183,6 +182,11 @@ async def send_message(request, room_id):
     room, user_message = await get_room_and_save_user_msg()
 
     @sync_to_async
+    def update_king_state(current_room, state):
+        current_room.king_state = state
+        current_room.save()
+
+    @sync_to_async
     def build_payload(current_room):
         """
         DB 작업 2
@@ -220,12 +224,13 @@ async def send_message(request, room_id):
                 "identity": persona.identity,
                 "values": persona.values
             },
+            "king_state" :current_room.king_state,
             "history": history
         }
 
     payload = await build_payload(room)
 
-    fastapi_url = settings.FASTAPI_URL
+    fastapi_url = settings.CHARACTER_FASTAPI_URL
 
     try:
         # FastAPI 서버에 비동기 POST 요청
@@ -238,6 +243,8 @@ async def send_message(request, room_id):
 
             # FastAPI가 {"reply": "..."} 형태로 준다고 가정
             ai_text = ai_data.get("reply", "")
+        
+            new_state = ai_data.get("king_state", room.king_state)
 
         @sync_to_async
         def save_ai_reply(current_room, content):
@@ -260,10 +267,12 @@ async def send_message(request, room_id):
             }
 
         character_message = await save_ai_reply(room, ai_text)
+        king_state = await update_king_state(room, new_state)
 
         return JsonResponse({
             "status": "success",
-            "character_message": character_message
+            "character_message": character_message,
+            "king_state" : king_state
         })
 
     except httpx.HTTPError as e:

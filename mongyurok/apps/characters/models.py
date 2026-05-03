@@ -72,7 +72,9 @@ class CharRoomSettings(models.Model) :
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="유저 ID")
     character = models.ForeignKey(CharModeInfo, on_delete=models.CASCADE, verbose_name="캐릭터 ID")
-    persona = models.ForeignKey(CharPersona, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="적용된 페르소나 ID")
+    persona = models.ForeignKey(Persona, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="적용된 페르소나 ID")
+    
+    king_state = models.CharField(max_length=20, default="평온함", verbose_name="왕의 기분을 표시")
 
     message_length = models.CharField(max_length=20, choices=MessageLength.choices, default=MessageLength.NORMAL, verbose_name="응답 길이")
 
