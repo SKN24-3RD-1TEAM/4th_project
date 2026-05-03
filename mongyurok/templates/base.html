@@ -14,7 +14,6 @@
     {% block extra_css %}{% endblock %}
     <script src="{% static 'js/layout/sidebar.js' %}" defer></script>
 </head>
-</head>
 <body>
     {% include 'layout/header.html' %}
 
@@ -28,5 +27,6 @@
         </main>
 
     </div>
+    {% block extra_js %}{% endblock %}
 </body>
-</html
+</html>

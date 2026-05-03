@@ -12,7 +12,7 @@
     <div class="sign-box">
         <h1 class="sign-title">계정 이용약관 동의</h1>
 
-        <form class="sign-form" method="post">
+        <form class="sign-form" action="{% url 'auths:sign_form' %}" method="post">
             {% csrf_token %}
 
             <div class="terms-list">
@@ -24,7 +24,7 @@
                             name="agree_all"
                             class="terms-checkbox"
                         >
-                        <span class="check-icon"></span>
+                        <span class="all-check"></span>
                         <span class="terms-text">약관 전체 동의하기</span>
                     </label>
                 </div>
@@ -38,14 +38,14 @@
                             class="terms-checkbox"
                             required
                         >
-                        <span class="check-icon"></span>
-                        <span class="terms-text">이용약관 동의</span>
+                        <span class="one-check"></span>
+                        <span class="terms-text item-check">이용약관 동의</span>
                     </label>
 
-                    <a href="#" class="terms-link">
+                    <a href="{% url 'auths:terms' %}" class="terms-link">
                         <span class="terms-link-text">약관보기</span>
                         <img
-                            src="{% static 'css/images/icons/sign_click.png' %}"
+                            src="{% static 'images/icons/sign_click.png' %}"
                             alt=""
                             class="terms-link-icon"
                         >
@@ -61,14 +61,14 @@
                             class="terms-checkbox"
                             required
                         >
-                        <span class="check-icon"></span>
+                        <span class="two-check"></span>
                         <span class="terms-text">개인정보 수집 및 이용 동의</span>
                     </label>
 
-                    <a href="#" class="terms-link">
+                    <a href="{% url 'auths:privacy' %}" class="terms-link">
                         <span class="terms-link-text">약관보기</span>
                         <img
-                            src="{% static 'css/images/icons/sign_click.png' %}"
+                            src="{% static 'images/icons/sign_click.png' %}"
                             alt=""
                             class="terms-link-icon"
                         >
@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="sign-next-button">
+            <button type="submit" class="sign-next-button" disabled>
                 다음
             </button>
         </form>
@@ -84,20 +84,50 @@
 </section>
 
 <script>
-    const agreeAll = document.getElementById('agree_all');
-    const agreeTerms = document.getElementById('agree_terms');
-    const agreePrivacy = document.getElementById('agree_privacy');
+    const allCheck = document.querySelector('.all-check');
+    const one = document.querySelector('.one-check');
+    const two = document.querySelector('.two-check');
+    const nextBtn = document.querySelector('.sign-next-button');
 
-    agreeAll.addEventListener('change', function () {
-        agreeTerms.checked = agreeAll.checked;
-        agreePrivacy.checked = agreeAll.checked;
+    function updateButtonState() {
+        const isBothChecked = one.classList.contains('active') && two.classList.contains('active');
+        
+        if (isBothChecked) {
+            nextBtn.classList.add('active'); 
+            nextBtn.disabled = false;    
+            nextBtn.onclick = function() {
+                location.href = "{% url 'auths:sign_form' %}";
+            };
+        } else {
+            nextBtn.classList.remove('active');
+            nextBtn.disabled = true;      
+        }
+    }
+ 
+    allCheck.addEventListener('click', function() {
+        const isNowActive = this.classList.toggle('active');
+        
+        if (isNowActive) {
+            one.classList.add('active');
+            two.classList.add('active');
+        } else {
+            one.classList.remove('active');
+            two.classList.remove('active');
+        }
+        updateButtonState();
     });
 
-    agreeTerms.addEventListener('change', updateAgreeAll);
-    agreePrivacy.addEventListener('change', updateAgreeAll);
-
-    function updateAgreeAll() {
-        agreeAll.checked = agreeTerms.checked && agreePrivacy.checked;
-    }
+    [one, two].forEach(item => {
+        item.addEventListener('click', function() {
+            this.classList.toggle('active');
+            if (one.classList.contains('active') && two.classList.contains('active')) {
+                allCheck.classList.add('active');
+            } else {
+                allCheck.classList.remove('active');
+            }
+            updateButtonState();
+        });
+        updateButtonState();
+    }); 
 </script>
 {% endblock %}

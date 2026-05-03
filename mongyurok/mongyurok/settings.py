@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-lt7$d^w^+69(qb#$2kgymz*kteo)yje7$w=yh=zlxoj-lqq(x)'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,6 +46,8 @@ INSTALLED_APPS = [
     'apps.characters',
     'apps.users',
 ]
+
+AUTH_USER_MODEL = 'auths.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,17 +84,24 @@ WSGI_APPLICATION = 'mongyurok.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'dream_db',
-        'USER' : 'root',
-        'PASSWORD' : '1234', 
-        'HOST' : '127.0.0.1',
-        'PORT' : '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'dream_db',
+#         'USER' : 'root',
+#         'PASSWORD' : os.getenv('LOCAL_RDSDB_PASSWORD'), 
+#         'HOST' : os.getenv('RDSDB_URL'),
+#         'PORT' : '3306',
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',
+#         },
+#     }
+# }
 
 
 # Password validation
@@ -130,3 +143,21 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+# CSRF_TRUSTED_ORIGINS = ["http://:8080"]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jiji0313233@gmail.com'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+
+CHARACTER_FASTAPI_URL = os.getenv('CHARACTER_FASTAPI_URL')
+SCENARIO_FASTAPI_URL = os.getenv('SCENARIO_FASTAPI_URL')
