@@ -80,7 +80,8 @@
     -moz-appearance: none;
 }
 
-.check-icon {
+.all-check, .one-check, .two-check  {
+    background-image: url("../../../images/icons/checkbox.png");
     width: 24.75px;
     height: 24.75px;
 
@@ -92,15 +93,13 @@
     display: inline-block;
     flex-shrink: 0;
 
-    background-image: url("../../images/icons/checkbox.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 24.75px 24.75px;
 }
 
-.terms-checkbox:checked + .check-icon,
-.terms-label input[type="checkbox"]:checked + .check-icon {
-    background-image: url("../../images/icons/join.png");
+.all-check.active, .one-check.active, .two-check.active {
+    background-image: url("../../../images/icons/checkedbox.png");
 }
 
 .terms-text {
@@ -166,5 +165,10 @@
     line-height: 19px;
     color: #FDFCF8;
 
+    cursor: pointer;
+}
+
+.sign-next-button.active {
+    background-color: #315057; /* 파란색 (원하는 색상으로 변경) */
     cursor: pointer;
 }

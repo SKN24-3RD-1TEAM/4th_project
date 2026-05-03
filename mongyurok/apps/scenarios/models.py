@@ -61,7 +61,7 @@ class SceneRoomSetting(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="scene_rooms", verbose_name="사용자 ID")
     scene = models.ForeignKey(SceneModeInfo, on_delete=models.CASCADE, related_name="rooms", verbose_name="시나리오 ID")
-    persona = models.OneToOneField('characters.Persona', on_delete=models.SET_NULL, null=True, blank=True, related_name="scene_room", verbose_name="적용된 페르소나 ID")
+    persona = models.OneToOneField('characters.CharPersona', on_delete=models.SET_NULL, null=True, blank=True, related_name="scene_room", verbose_name="적용된 페르소나 ID")
     
     msg_len = models.CharField(max_length=20, choices=MessageLength.choices, default=MessageLength.NORMAL, verbose_name="답변 길이 설정")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일시")

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from asgiref.sync import sync_to_async
 from .models import SceneModeInfo, SceneRoomSetting, SceneMessage
-from apps.characters.models import Persona
+from apps.characters.models import CharPersona
 
 def main_scenarios(request) :
     return render(request, 'scenarios/main.html')
