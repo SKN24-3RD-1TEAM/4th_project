@@ -1,9 +1,12 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Persona, CharModeInfo, CharRoomSettings, CharMessages
+from .models import CharPersona, CharModeInfo, CharRoomSettings, CharMessages
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.conf import settings
+
+def index(request) :
+    return render(request, 'characters/main.html')
 
 def character_list(request) :
     """
@@ -11,7 +14,7 @@ def character_list(request) :
     """
     characters = CharModeInfo.objects.all()
 
-    return render(request, "characters/main.html", {
+    return render(request, "chats/char_list.html", {
         "characters" : characters
     })
 
@@ -57,7 +60,7 @@ def persona_setting(request, character_id):
 
     # 사용자가 아무것도 입력하지 않았을 때 사용할 기본값
     DEFAULT_PERSONALITY = "모든 행동에 민감하게 반응하는 성격"
-    DEFAULT_IDENTITY = Persona.SelectIdentity.FARMER
+    DEFAULT_IDENTITY = CharPersona.SelectIdentity.FARMER
     DEFAULT_VALUES = "밥 먹는 것이 최고고 모든 문제는 밥으로 해결 가능하다."
     DEFAULT_SCENE = "밥 먹다가 왕에게 갑자기 호출됐다."
 
@@ -74,7 +77,7 @@ def persona_setting(request, character_id):
     final_first_scene = req_first_scene or DEFAULT_SCENE
 
     # 이 채팅방에서 사용할 전용 페르소나 생성
-    room_persona = Persona.objects.create(
+    room_persona = CharPersona.objects.create(
         user=request.user,
         personality=final_personality,
         identity=final_identity,
