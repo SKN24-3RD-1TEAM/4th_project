@@ -280,3 +280,11 @@ async def send_chat(request, room_id):
 
     except Exception as e:
         return JsonResponse({"status": "error", "message": "통신 중 오류가 발생했습니다."}, status=500)
+
+@login_required(login_url="auths:login")
+def delete_scene_room(request, room_id):
+    if request.method == 'DELETE':
+        room = get_object_or_404(SceneRoomSetting, id=room_id, user=request.user)
+        room.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)

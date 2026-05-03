@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'apps.scenarios',
     'apps.characters',
     'apps.users',
+    'apps.images'
 ]
 
 AUTH_USER_MODEL = 'auths.User'
@@ -71,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.characters.context_processors.sidebar_rooms',
             ],
         },
     },
