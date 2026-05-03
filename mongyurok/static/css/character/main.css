@@ -1,7 +1,7 @@
 
 .main-char, .main-story{
     margin-top: 140px;
-    margin-bottom: 139px;
+    min-height: calc(100vh - 210px);
 }
 
 .main-story{

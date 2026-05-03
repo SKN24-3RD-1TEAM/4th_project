@@ -73,12 +73,14 @@ header {
     cursor: pointer;
 }
 
-.login-box .header-profile {
+.login-box .header-profile img {
     width: 28px;
     height: 28px;
-    background-color: #848484;
+    background-color: red;
     border-radius: 4px;
     position: relative;
+    margin-left: 0px;
+    margin-bottom: 5px;
 }
 
 .header-hover {
