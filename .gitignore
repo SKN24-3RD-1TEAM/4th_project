@@ -13,8 +13,6 @@ __pycache__/
 *.log
 db.sqlite3
 dream_db
-media/
-staticfiles/
 
 # ── 가상환경 ──
 venv/
