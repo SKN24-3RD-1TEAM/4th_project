@@ -19,4 +19,6 @@ urlpatterns = [
 
     # 메시지 비동기 전송
     path("rooms/<int:room_id>/send/",views.send_message,name="send_message"),
+
+    path('rooms/<int:room_id>/delete/', views.delete_char_room, name='delete_char_room'),
 ]

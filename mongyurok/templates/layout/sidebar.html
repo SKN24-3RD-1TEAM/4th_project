@@ -1,25 +1,118 @@
 {% load static %}
 <aside class="sidebar" id="sidebar">
-    <div class = 'sidebar-top-group'>
-        <p>이전채팅</p>
-        <button class="ham-sidebar-btn" id="toggle-btn"><img src="{% static 'images/icons/ham-menu.png' %}" alt="메뉴 아이콘"></button>
-    </div>
-    <div class="sidebar-content-menu">
-        <div data-target="char">
-            <button class="sidebar-char-menu">
-                <p>독대 모드</p>
-            </button>
-            <div></div>
-        </div>
-        <div data-target="story">
 
-            <button class="sidebar-story-menu">
-                <p>역할극 모드</p>
-            </button>
-            <div></div>
+
+    <div class="sidebar-inner">
+        <!-- 상단: 제목 + 접기 버튼 -->
+        <div class="sidebar-top-group">
+            <p>이전 채팅</p>
+        </div>
+
+        <!-- 2-2 비로그인 안내 -->
+        {% if not request.user.is_authenticated %}
+        <div class="sidebar-login-notice">
+            <p>로그인하면 대화 기록을<br>확인할 수 있어요.</p>
+            <a href="{% url 'auths:login' %}" class="sidebar-login-btn">로그인</a>
+        </div>
+
+        {% else %}
+
+        <!-- 모드 탭 (로그인 시에만 표시) -->
+        <div class="sidebar-content-menu">
+            <div>
+                <button class="sidebar-char-menu menu-item {% if request.resolver_match.app_name == 'characters' %}active{% endif %}"
+                        data-mode="char">
+                    독대 모드
+                </button>
+                <div class="tab-underline"></div>
+            </div>
+            <div>
+                <button class="sidebar-story-menu menu-item {% if request.resolver_match.app_name == 'scenarios' %}active{% endif %}"
+                        data-mode="story">
+                    역할극 모드
+                </button>
+                <div class="tab-underline"></div>
+            </div>
+        </div>
+
+        <!-- 대화 목록 -->
+        <div class="sidebar-content-group" id="history-container">
+
+            <!-- 독대 모드 목록 -->
+            <div id="char-history"
+                 class="{% if request.resolver_match.app_name == 'scenarios' %}hidden{% endif %}">
+                {% for room in char_rooms %}
+                <div class="sidebar-items-group" data-room-id="{{ room.id }}" data-mode="char">
+                    <div class="sidebar-items-img"
+                         {% if room.character.img_url and room.character.img_url.name %}
+                         style="background-image: url('{{ room.character.img_url.url }}'); background-size: cover; background-position: center;"
+                         {% endif %}>
+                    </div>
+                    <div class="sidebar-itmes-content">
+                        <p>{{ room.character.kor_name }}</p>
+                        <p>{{ room.messages.last.content|truncatechars:12|default:"대화 없음" }}</p>
+                    </div>
+                    <div class="sidebar-item-right">
+                        <p class="sidebar-continue-btn"></p>
+                        <img src="{% static 'images/icons/sidebar-right.png' %}" alt="›">
+                    </div>
+                    <!-- 삭제 버튼 (호버 시 표시) -->
+                    <button class="sidebar-delete-btn" data-room-id="{{ room.id }}" data-mode="char"
+                            title="대화 삭제">✕</button>
+                </div>
+                {% empty %}
+                <p class="sidebar-empty">아직 대화 기록이 없어요.</p>
+                {% endfor %}
+            </div>
+
+            <!-- 역할극 모드 목록 -->
+            <div id="story-history"
+                 class="{% if request.resolver_match.app_name == 'characters' %}hidden{% endif %}">
+                {% for room in scene_rooms %}
+                <div class="sidebar-items-group" data-room-id="{{ room.id }}" data-mode="story">
+                    <div class="sidebar-items-img"
+                         {% if room.scene.img_url and room.scene.img_url.name %}
+                         style="background-image: url('{{ room.scene.img_url.url }}'); background-size: cover; background-position: center;"
+                         {% endif %}>
+                    </div>
+                    <div class="sidebar-itmes-content">
+                        <p>{{ room.scene.title }}</p>
+                        <p>{{ room.messages.last.content|truncatechars:12|default:"대화 없음" }}</p>
+                    </div>
+                    <div class="sidebar-item-right">
+                        <p class="sidebar-continue-btn"></p>
+                        <img src="{% static 'images/icons/sidebar-right.png' %}" alt="›">
+                    </div>
+                    <button class="sidebar-delete-btn" data-room-id="{{ room.id }}" data-mode="story"
+                            title="대화 삭제">✕</button>
+                </div>
+                {% empty %}
+                <p class="sidebar-empty">아직 대화 기록이 없어요.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endif %}
+    
+    </div>
+
+    <button class="ham-sidebar-btn" id="toggle-btn">
+        <img src="{% static 'images/icons/ham-menu.png' %}" alt="메뉴 접기">
+    </button>
+
+</aside>
+
+<!-- 2-3-3 대화 삭제 확인 모달 -->
+<div class="sidebar-delete-modal" id="delete-modal">
+    <div class="sidebar-delete-modal-box">
+        <p class="delete-modal-title">대화 이력 삭제</p>
+        <p class="delete-modal-desc">
+            선택한 대화의 모든 메시지를 삭제합니다.<br>
+            삭제된 대화는 복구할 수 없습니다.
+        </p>
+        <div class="delete-modal-actions">
+            <button class="delete-cancel-btn" id="delete-cancel-btn">취소</button>
+            <button class="delete-confirm-btn" id="delete-confirm-btn">삭제</button>
         </div>
     </div>
-    <div class="sidebar-content-group">
-        {% include 'layout/components/history-block.html' %}
-    </div>
-</aside>
+</div>

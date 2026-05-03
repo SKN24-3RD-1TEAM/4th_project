@@ -1,10 +1,69 @@
+/* ── 사이드바 컨테이너 ── */
 .sidebar {
     background-color: #1E2121;
     width: 320px;
-    padding: 25px 0px;
+    min-width: 320px;
+    padding: 25px 0;
+    flex-shrink: 0;
+    transition: width 0.25s ease, min-width 0.25s ease;
+    overflow: hidden;
+    min-height: 100vh;
+    position: relative;
+    align-self: stretch;
 }
 
+/* 내부 콘텐츠를 overflow로 자름 */
+.sidebar-inner {
+    width: 320px;
+    overflow: hidden;      /* ✅ inner에서 자름 */
+    min-height: 100%;
+}
+
+.sidebar.collapsed .sidebar-inner {
+    width: 0;              /* ✅ 내용 전체 숨김 */
+}
+
+
+/* ── 접힌 상태 ── */
+.sidebar.collapsed {
+    width: 60px;
+    min-width: 60px;
+}
+
+/* ── 상단 그룹 ── */
+.sidebar-top-group {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    font-size: 18px;
+    color: #FCFEFD;
+    margin-bottom: 35px;
+    padding: 0 25px;
+    width: 320px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+
+/* 접힌 상태: 버튼 중앙 정렬 */
+.sidebar.collapsed .ham-sidebar-btn {
+    right: 50%;
+    transform: translateX(50%)
+}
+
+/* 접힌 상태: 텍스트·메뉴·목록·비로그인 숨김 */
+.sidebar.collapsed .sidebar-top-group,
+.sidebar.collapsed .sidebar-content-menu,
+.sidebar.collapsed .sidebar-content-group,
+.sidebar.collapsed .sidebar-login-notice {
+    display: none;
+}
+
+/* ── 햄버거 버튼 ── */
 .ham-sidebar-btn {
+    position: absolute;
+    top: 25px;
+    right: 20px;
     background: none;
     border: none;
     padding: 0;
@@ -12,130 +71,278 @@
     cursor: pointer;
     width: 20px;
     height: 15px;
+    z-index: 10;
+    flex-shrink: 0;
 }
 
-.sidebar-top-group {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height:20px;
-    font-size: 18px;
-    color: #FCFEFD;
-    margin-bottom: 35px;
-    width: 320px;
-    padding: 0px 25px;
-}
-
-.ham-sidebar-btn img{
+.ham-sidebar-btn img {
     width: 20px;
-
-}
-.sidebar.collapsed {
-    width: 60px;
-    transition: width 0.3s ease;
+    display: block;
 }
 
-.sidebar.collapsed .sidebar-top-group{
-    display: flex;
-    justify-content: center;
-    width: 60px;
-    transition: width 0.3s ease;
+/* ── 비로그인 안내 ── */
+.sidebar-login-notice {
+    width: 320px;
+    box-sizing: border-box;
+    padding: 20px 25px;
+    text-align: center;
 }
 
-.sidebar.collapsed .sidebar-top-group p{
-    display: none;
+.sidebar-login-notice p {
+    font-size: 14px;
+    color: #848484;
+    line-height: 1.6;
+    margin-bottom: 16px;
 }
 
-.sidebar.collapsed .sidebar-content-menu, .sidebar.collapsed .sidebar-content-group{
-    display: none;
+.sidebar-login-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+    background: #389393;
+    color: #FCFEFD;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.18s;
+    box-sizing: border-box;
 }
 
+.sidebar-login-btn:hover { background: #2a7474; }
+
+/* ── 모드 탭 ── */
 .sidebar-content-menu {
     display: flex;
-    justify-content: space-between;
+    width: 320px;
+    box-sizing: border-box;
     height: 60px;
 }
 
-
-.sidebar-content-menu .sidebar-char-menu {
-    height: 40px;
-    width: 160px;
-    background: none;
-    border: none;
-    padding: 0px;
-    outline: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #FCFEFD;
+.sidebar-content-menu > div {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
 }
 
-.sidebar-content-menu .sidebar-story-menu {
+.sidebar-char-menu,
+.sidebar-story-menu {
     height: 40px;
-    width: 160px;
+    width: 100%;
     background: none;
     border: none;
     padding: 0;
     outline: none;
     cursor: pointer;
     font-size: 18px;
+    color: #848484;
+    font-family: 'Pretendard', sans-serif;
+    transition: color 0.18s;
+    white-space: nowrap;
+}
+
+.sidebar-char-menu.active,
+.sidebar-story-menu.active {
     color: #FCFEFD;
 }
 
-.sidebar-content-menu>div{
-    display: flex;
-    flex-direction: column;
+.tab-underline {
+    height: 3px;
+    width: 100%;
+    background-color: transparent;
+    transition: background-color 0.18s;
 }
 
-.sidebar-content-menu div div{
-    height: 3px;
-    width: 160px;
+.sidebar-content-menu > div:has(.active) .tab-underline {
     background-color: #FCFEFD;
 }
 
+/* ── 대화 목록 컨테이너 ── */
 .sidebar-content-group {
-    min-height: calc(100vh - 80px);
+    width: 320px;
+    box-sizing: border-box;
     margin-top: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 160px);
 }
 
+.hidden { display: none; }
+
+/* ── 대화 아이템 ── */
 .sidebar-items-group {
-    padding: 0 25px;
+    width: 320px;
+    box-sizing: border-box;
+    padding: 12px 25px;
     display: flex;
     align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+}
+
+.sidebar-items-group:hover {
+    background: rgba(255,255,255,0.05);
 }
 
 .sidebar-items-img {
-    width:44px;
-    height:44px;
-    background-color: white;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    background-color: #3a3a3a;
+    border-radius: 6px;
     margin-right: 10px;
+    flex-shrink: 0;
 }
-.sidebar-itmes-content{
+
+.sidebar-itmes-content {
     color: #FCFEFD;
-    width: 130px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
-.sidebar-itmes-content p:nth-child(1){
+.sidebar-itmes-content p:nth-child(1) {
     font-weight: 600;
-    font-size: 18px;
-}
-
-.sidebar-itmes-content p:nth-child(2){
     font-size: 16px;
-    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.sidebar-items-group>div:nth-child(3) {
+.sidebar-itmes-content p:nth-child(2) {
+    font-size: 13px;
+    color: #848484;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-item-right {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
+    margin-left: 8px;
 }
 
-.sidebar-items-group>div:nth-child(3) p {
-    margin-left: 10px;
-    margin-right: 0px;
+.sidebar-continue-btn {
+    font-size: 13px;
     color: #848484;
+    white-space: nowrap;
 }
 
-.sidebar-items-group>div:nth-child(3) img{
+.sidebar-item-right img {
     width: 7px;
     margin-left: 5px;
 }
+
+/* 삭제 버튼 */
+.sidebar-delete-btn {
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #848484;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+    line-height: 1;
+}
+
+.sidebar-items-group:hover .sidebar-delete-btn { display: block; }
+.sidebar-delete-btn:hover { color: #e05555; background: rgba(255,255,255,0.08); }
+.sidebar-items-group:hover .sidebar-item-right { display: none; }
+
+/* 빈 목록 */
+.sidebar-empty {
+    width: 320px;
+    box-sizing: border-box;
+    padding: 20px 25px;
+    color: #848484;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* 스크롤바 */
+.sidebar-content-group::-webkit-scrollbar { width: 4px; }
+.sidebar-content-group::-webkit-scrollbar-track { background: transparent; }
+.sidebar-content-group::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 2px; }
+
+/* ── 삭제 확인 모달 ── */
+.sidebar-delete-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 600;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-delete-modal.open { display: flex; }
+
+.sidebar-delete-modal-box {
+    background: #FFF8F0;
+    border-radius: 10px;
+    padding: 28px 28px 22px;
+    width: 320px;
+    text-align: center;
+}
+
+.delete-modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1E2121;
+}
+
+.delete-modal-desc {
+    font-size: 14px;
+    color: #848484;
+    line-height: 1.7;
+    margin-bottom: 22px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.delete-cancel-btn {
+    padding: 9px 20px;
+    background: none;
+    border: 1.5px solid #d0c8be;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Pretendard', sans-serif;
+    cursor: pointer;
+    color: #848484;
+    transition: background 0.15s;
+}
+
+.delete-cancel-btn:hover { background: #f0ece6; }
+
+.delete-confirm-btn {
+    padding: 9px 20px;
+    background: #e05555;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    transition: background 0.15s;
+}
+
+.delete-confirm-btn:hover { background: #c43c3c; }

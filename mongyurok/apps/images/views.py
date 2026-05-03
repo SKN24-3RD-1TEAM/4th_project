@@ -25,6 +25,6 @@ def imgs(request):
         },
     ]
 
-    return render(request, 'images/img_list.html', {
+    return render(request, 'images/list.html', {
         'image_list': image_list
     })

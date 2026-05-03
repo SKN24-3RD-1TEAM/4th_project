@@ -106,3 +106,9 @@
 }
 .modal-start-btn:hover { background: #e0d8cc; }
 .modal-start-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+.main-char .main-char-content-group,
+.main-story .main-story-content-group {
+    margin-top: 35px;
+    padding-bottom: 80px;   /* ✅ 추가 */
+}

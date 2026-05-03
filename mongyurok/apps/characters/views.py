@@ -283,3 +283,11 @@ async def send_message(request, room_id):
             "status": "error",
             "message": f"처리 중 오류가 발생했습니다: {str(e)}"
         }, status=500)
+
+@login_required(login_url="auths:login")
+def delete_char_room(request, room_id):
+    if request.method == 'DELETE':
+        room = get_object_or_404(CharRoomSettings, id=room_id, user=request.user)
+        room.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
