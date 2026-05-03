@@ -23,6 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auths/', include('apps.auths.urls')),
     path('scenarios/', include('apps.scenarios.urls')),
-    path('users/', include('apps.users.urls')),
-    path("", include('apps.characters.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('', include('apps.users.urls')),
+    path('', include('apps.characters.urls')),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

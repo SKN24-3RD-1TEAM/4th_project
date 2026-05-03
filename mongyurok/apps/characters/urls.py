@@ -4,7 +4,7 @@ from . import views
 app_name = 'characters'
 
 urlpatterns = [
-    path('', views.character_list, name='main'),
+    path('', views.index, name='main'),
     # 캐릭터 목록 페이지
     path("characters/",views.character_list,name="character_list"),
 
