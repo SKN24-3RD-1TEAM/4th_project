@@ -1,7 +1,7 @@
 from django.db import models
-from apps.auths.models import User
+from apps.users.models import User
 
-class Persona(models.Model) :
+class CharPersona(models.Model) :
     """
     사용자가 독대 모드 시작 전에 설정한 페르소나 정보
     """
@@ -48,7 +48,7 @@ class CharModeInfo(models.Model) :
     summary = models.TextField(max_length=200, verbose_name="왕 정보 요약")
 
     # 왕 이미지 (characters/taejo.png) 이런식으로 저장
-    img_url = models.ImageField(upload_to="characters/")
+    img_url = models.ImageField(upload_to="charaters/")
 
     class Meta :
         # 실제 db에 저장될 이름

@@ -23,14 +23,16 @@
                     <a href="{% url 'auths:login' %}" class="header-profile">
                         <p>로그인</p>
                     </a>
-                {% else %}    
-                    {% if user.profile_image_url %}
-                        <img src="{{ user.profile_image_url }}">
-                    {% else %}
-                        <img src="{% static 'images/profile_default.png' %}">
-                    {% endif %}
+                {% else %}
+                    <a href="{% url 'users:mypage' %}" class="header-profile">
+                        {% if user.img_url %}
+                            <img src="{{ user.img_url.url }}" alt="내프로필">
+                        {% else %}
+                            <img src="{% static 'images/users/profile.png' %}" alt="기본 프로필">
+                        {% endif %}
+                    </a>
                 {% endif %}
-            <div>
+            </div>
         </div>
             </div>
             {% if user.is_authenticated %}
