@@ -1,0 +1,17 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block content %}
+<section class="main-char">
+    <img src="{% static 'images/character/main-char-banner.png' %}" alt="메뉴 아이콘">
+    <div class="main-char-content-group">
+        <p>독대 모드</p>
+        <p>조선왕과 자유롭게 채팅을 나눠보세요</p>
+        <div class="card-container">
+            {% for i in "123456" %}
+                {% include 'characters/components/char-card.html' %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

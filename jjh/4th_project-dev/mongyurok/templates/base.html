@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}몽유록{% endblock %}</title>
+
+    <link rel="icon" href="{% static 'images/logo.png' %}">
+
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components/layout/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components/layout/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components/layout/footer.css' %}">
+
+    <!-- 페이지별 CSS -->
+    {% block extra_css %}{% endblock %}
+
+    <script src="{% static 'js/layout/sidebar.js' %}" defer></script>
+</head>
+
+<body>
+
+    {% include 'layout/header.html' %}
+
+    <!-- 🔥 핵심: 전체 레이아웃 -->
+    <div class="main-group">
+
+        <!-- 🔥 사이드바 항상 출력 -->
+        {% include 'layout/sidebar.html' %}
+
+        <!-- 메인 -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+            {% include 'layout/footer.html' %}
+        </main>
+
+    </div>
+
+</body>
+</html>

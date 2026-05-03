@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/images/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="image-page">
+
+    <h2 class="title">이미지</h2>
+    <p class="desc">생성된 이미지를 확인하세요</p>
+
+    <div class="image-list">
+
+        <div class="image-card">
+            <img src="{% static 'images/character/char-card1.png' %}">
+        </div>
+
+        <div class="image-card">
+            <img src="{% static 'images/character/char-card2.png' %}">
+        </div>
+
+        <div class="image-card">
+            <img src="{% static 'images/character/char-card1.png' %}">
+        </div>
+
+        <div class="image-card">
+            <img src="{% static 'images/character/char-card2.png' %}">
+        </div>
+
+        <div class="image-card">
+            <img src="{% static 'images/character/char-card1.png' %}">
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

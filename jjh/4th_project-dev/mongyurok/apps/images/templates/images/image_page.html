@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/images/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="image-section">
+
+    <div class="image-section-head">
+        <h2 class="image-title">이미지</h2>
+        <p class="image-subtitle">이미지를 만드는 화면을 보여주세요</p>
+    </div>
+
+    {% if user.is_authenticated %}
+    <form method="post" enctype="multipart/form-data"
+          action="{% url 'images:upload_image' %}"
+          class="upload-form">
+        {% csrf_token %}
+        <label class="upload-btn">
+            업로드
+            <input type="file" name="image" accept="image/*"
+                   onchange="this.form.submit()">
+        </label>
+    </form>
+    {% endif %}
+
+    <div class="image-box">
+
+        {% if images %}
+        <ul class="thumb-list">
+            {% for img in images %}
+            <li class="thumb">
+                <img src="{{ img.image.url }}">
+                <p class="thumb-caption">{{ img.title }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+
+        {% else %}
+        <p class="image-empty">
+            아직 저장된 이미지가 없습니다.<br>
+            로그인하면 업로드할 수 있어요.
+        </p>
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

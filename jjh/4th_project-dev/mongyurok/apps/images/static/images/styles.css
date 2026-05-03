@@ -1,0 +1,183 @@
+/* SCR-MAIN-05 이미지 화면 — 정의서 기준 레이아웃 */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+    color: #0f172a;
+    background: #ffffff;
+}
+button { font-family: inherit; cursor: pointer; }
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* 1. 헤더 */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    height: 56px;
+    padding: 0 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+    flex-shrink: 0;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header-menu {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: none; border-radius: 6px;
+    color: #0f172a;
+}
+.header-menu:hover { background: #f3f4f6; }
+.logo { margin: 0; font-size: 20px; font-weight: 700; }
+.nav { display: flex; align-items: center; gap: 16px; }
+.nav-link {
+    background: none; border: none; padding: 0;
+    color: #6b7280; font-size: 14px;
+}
+.nav-link:hover { color: #0f172a; }
+.nav-link--active { color: #0f172a; font-weight: 500; }
+
+.header-search { flex: 1; display: flex; justify-content: center; }
+.search-box { position: relative; width: 100%; max-width: 448px; }
+.search-icon {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; color: #6b7280; pointer-events: none;
+}
+.search-input {
+    width: 100%; height: 36px;
+    padding: 0 12px 0 36px;
+    border: 1px solid #e5e7eb; border-radius: 6px;
+    background: #ffffff; font-size: 14px; outline: none;
+}
+.search-input:focus { box-shadow: 0 0 0 2px #93c5fd; }
+
+.user-btn {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border: none; background: none; border-radius: 9999px;
+    color: #6b7280;
+}
+.user-btn:hover { background: #f3f4f6; color: #0f172a; }
+
+/* 2. 본문 */
+.body { flex: 1; display: flex; }
+
+/* 2-a. 사이드바 */
+.sidebar {
+    width: 256px; flex-shrink: 0;
+    display: flex; flex-direction: column;
+    background: oklch(0.18 0.02 265);
+    color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+}
+.sidebar-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+}
+.sidebar-title { font-size: 14px; font-weight: 600; }
+.sidebar-toggle {
+    background: none; border: none; padding: 4px;
+    color: rgba(255,255,255,0.6); border-radius: 4px;
+}
+.sidebar-toggle:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.chat-list { list-style: none; margin: 0; padding: 0 8px; flex: 1; overflow-y: auto; }
+.chat-item {
+    width: 100%;
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 12px; border-radius: 6px;
+    background: none; border: none; text-align: left;
+}
+.chat-item:hover { background: rgba(255,255,255,0.05); }
+.chat-avatar {
+    width: 32px; height: 32px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 9999px; background: rgba(255,255,255,0.1);
+    color: #fff; font-size: 12px;
+}
+.chat-text { min-width: 0; flex: 1; }
+.chat-name { margin: 0; color: #fff; font-size: 14px; font-weight: 500;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-preview { margin: 0; color: rgba(255,255,255,0.5); font-size: 12px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 2-b. 메인 컬럼 (이미지 + 푸터) */
+.main-col { flex: 1; display: flex; flex-direction: column; }
+
+.main { flex: 1; overflow-y: auto; padding: 40px 48px; }
+.image-section { max-width: 1024px; margin: 0 auto; }
+.image-section-head { margin-bottom: 12px; }
+.image-title { margin: 0; font-size: 24px; font-weight: 700; }
+.image-subtitle { margin: 4px 0 0 0; font-size: 14px; color: #6b7280; }
+
+.upload-form { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+.upload-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 6px;
+    background: #0f172a; color: #ffffff; font-size: 14px; font-weight: 500;
+    cursor: pointer;
+}
+.upload-btn:hover { background: rgba(15,23,42,0.9); }
+.upload-input { display: none; }
+
+.image-box {
+    border: 1px solid #e5e7eb; border-radius: 8px;
+    background: #ffffff; padding: 16px;
+}
+.image-empty { margin: 0; padding: 48px 0; text-align: center; font-size: 14px; color: #6b7280; }
+
+.thumb-list { list-style: none; margin: 0; padding: 0 0 8px;
+    display: flex; gap: 12px; overflow-x: auto; }
+.thumb { position: relative; flex-shrink: 0; }
+.thumb-link {
+    display: block; width: 144px; height: 144px;
+    border: 1px solid #e5e7eb; border-radius: 6px;
+    background: #f3f4f6; overflow: hidden;
+}
+.thumb-link img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.thumb-link:hover img { transform: scale(1.05); }
+.thumb-caption {
+    margin: 6px 0 0; width: 144px; text-align: center;
+    font-size: 12px; color: #6b7280;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.thumb-delete-form { position: absolute; top: 4px; right: 4px; margin: 0; }
+.thumb-delete {
+    background: rgba(0,0,0,0.6); color: #fff; border: none;
+    padding: 2px 6px; border-radius: 9999px; font-size: 10px;
+    opacity: 0; transition: opacity .2s;
+}
+.thumb:hover .thumb-delete { opacity: 1; }
+
+/* 4. 푸터 */
+.footer {
+    position: relative; flex-shrink: 0;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff; overflow: hidden;
+}
+.footer-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: right;
+    opacity: 0.8; pointer-events: none;
+}
+.footer-inner {
+    position: relative;
+    display: flex; flex-direction: column; gap: 24px;
+    padding: 40px;
+}
+@media (min-width: 640px) {
+    .footer-inner { flex-direction: row; justify-content: space-between; }
+    .footer-contact { padding-right: 80px; }
+}
+.footer-info, .footer-contact { font-size: 12px; color: #6b7280; }
+.footer-info p, .footer-contact p { margin: 0; line-height: 1.6; }
+.footer-policy { font-weight: 500; color: #0f172a; margin-bottom: 12px !important; }
+.footer-company { font-weight: 600; color: #0f172a; }
+.footer-copy { margin-top: 12px !important; font-weight: 500; color: #0f172a; }
+.footer-contact-title { font-weight: 500; color: #0f172a; margin-bottom: 8px !important; }
