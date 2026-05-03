@@ -12,12 +12,12 @@
     <div class="auth-box">
         <h2 class="auth-title">로그인</h2>
 
-        <form method="post" class="auth-form">
+        <form method="post" action="{% url 'auths:login' %}" class="auth-form">
             {% csrf_token %}
 
             <input 
-                type="email"
-                name="email"
+                type="text"
+                name="username"
                 class="auth-input"
                 placeholder="이메일을 입력해주세요"
             >
@@ -28,6 +28,13 @@
                 class="auth-input"
                 placeholder="비밀번호를 입력해주세요"
             >
+
+            {% if form.errors %}
+                <div class="auth-error">
+                    아이디 또는 비밀번호가 올바르지 않습니다.
+                </div>
+            {% endif %}
+
 
             <div class="password-find">
                 <a href="#">비밀번호 찾기</a>
