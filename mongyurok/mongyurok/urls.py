@@ -25,6 +25,7 @@ urlpatterns = [
     path('scenarios/', include('apps.scenarios.urls')),
     path('', include('apps.users.urls')),
     path('', include('apps.characters.urls')),
+    path('imgs/', include('apps.images.urls')),
 ]
 
 if settings.DEBUG:
