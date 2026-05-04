@@ -1,6 +1,7 @@
 # ── 환경변수 ──
 .env
 .env.*
+*/env
 
 # ── Python ──
 __pycache__/
@@ -34,3 +35,5 @@ desktop.ini
 
 # ── Docker ──
 .dockerignore
+
+*.pem
