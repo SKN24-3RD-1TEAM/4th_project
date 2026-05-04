@@ -144,7 +144,7 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = BASE_DIR / 'static'
 
-# CSRF_TRUSTED_ORIGINS = ["http://:8080"]
+CSRF_TRUSTED_ORIGINS = ["http://52.78.197.220:8080"]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
