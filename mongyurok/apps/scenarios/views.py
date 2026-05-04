@@ -222,7 +222,7 @@ async def send_chat(request, room_id):
                         "type": final_type,
                         "content": content,
                         "char_name": char_obj.name if char_obj else None,
-                        "char_img_url": char_obj.img_url if char_obj else None,
+                        "char_img_url": char_obj.img_url.url if char_obj and char_obj.img_url else None,
                     })
                 
                 return saved_msgs
