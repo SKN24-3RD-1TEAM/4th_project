@@ -115,7 +115,7 @@ function appendMessage(container, type, content, nickname) {
         msgDiv.innerHTML = `<div class="situ-mes"><div>"${content}"</div></div>`;
     }
 
-    const messageContentArea = container.querySelector('.char-room-message > div') || container;
+    const messageContentArea = container;
     messageContentArea.appendChild(msgDiv);
 
     // 스크롤 하단 이동
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('send-btn');
     const chatInput = document.getElementById('chat-input');
     const personaModal = document.getElementById('persona-modal');
-    const messageContainer = document.querySelector('.char-room-message');
+    const messageContainer = document.querySelector('.char-room-message > div');
     const currentCount = document.getElementById('current-count');
 
     const userNickname = "{{ user.nickname }}";
@@ -163,53 +163,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. 메시지 전송 로직 수정
     sendBtn.addEventListener('click', async () => {
-        const message = chatInput.value.trim();
-        if (!message) return;
-        
+    const message = chatInput.value.trim();
+    if (!message) return;
 
-        // 유저 메시지 즉시 렌더링
-        appendMessage(
-            messageContainer,
-            'user',
-            message,
-            userNickname || '나',
-        );
+    appendMessage(messageContainer, 'user', message, userNickname || '나');
+    chatInput.value = '';
+    currentCount.textContent = '0';
 
-        chatInput.value = '';
-        currentCount.textContent = '0';
+    try {
+        const response = await fetch("{% url 'scenarios:send_chat' room.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrftoken
+            },
+            body: new URLSearchParams({ 'content': message })
+        });
 
-                // 백엔드는 'content'라는 키로 메시지를 기다림
-            const response = await fetch("{% url 'scenarios:send_chat' room.id %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrftoken
-                },
-                body: new URLSearchParams({ 'content': message }) // 키를 'content'로 변경
+        if (!response.ok) throw new Error("서버 응답 오류");
+
+        const data = await response.json();
+        console.log(data);
+
+        if (data.status === 'success' && Array.isArray(data.new_messages)) {
+            data.new_messages.forEach(msg => {
+                appendMessage(
+                    messageContainer,
+                    msg.type,
+                    msg.content,
+                    msg.char_name || ''
+                );
             });
-
-            if (!response.ok) throw new Error("서버 응답 오류");
-
-            const data = await response.json();
-            console.log(data)
-            
-                    console.log(data); // 브라우저 콘솔에서 데이터가 들어오는지 꼭 확인하세요!
-
-                    // 1. data.replies 대신 data.new_messages를 써야 합니다.
-                    if (data.status === 'success' && Array.isArray(data.new_messages)) {
-                        data.new_messages.forEach(msg => {
-                            appendMessage(
-                                messageContainer,
-                                msg.type,          // View의 final_type ("character" 또는 "scene")
-                                msg.content,       // 메시지 내용
-                                msg.char_name || '', // 캐릭터 이름
-                            );
-                        });
-                        
-                        // 메시지 추가 후 스크롤 하단 이동 (선택사항이지만 추천!)
-                        messageContainer.scrollTop = messageContainer.scrollHeight;
-                    }
-                });
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+    } catch (e) {
+        console.error("전송 중 오류:", e);
+        alert("메시지 전송에 실패했습니다.");
+    }
+});
 
     // 엔터키 및 글자수 카운트 (기존 동일)
     chatInput.addEventListener('keypress', e => {

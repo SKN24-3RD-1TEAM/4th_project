@@ -113,60 +113,45 @@
         </div>
     </div> <!-- .char-room-profile 끝 -->
 <script>
-// ==========================
-// 메시지 추가 함수 (전역)
-// ==========================
-function appendMessage(container, type, content, nickname, imgUrl) {
+function appendMessage(container, type, content, nickname) {
     const msgDiv = document.createElement('div');
 
-    // 1. 클래스 및 내부 HTML 설정 (기존과 동일)
     if (type === 'user') {
         msgDiv.className = 'user-box-group';
         msgDiv.innerHTML = `
         <div class="user-box-mes">
             <p class="user-nickname">${nickname}</p>
             <div class="user-bubble">${content}</div>
-        </div>
-        `;
+        </div>`;
     } else if (type === 'character' || type === 'CHARACTER') {
         msgDiv.className = 'char-box-group';
         msgDiv.innerHTML = `
-            <div class="char-img-wrap">
-            </div>
+            <div class="char-img-wrap"></div>
             <div class="char-box-mes">
                 <p class="char-nickname">${nickname}</p>
                 <div class="char-bubble">${content}</div>
-            </div>
-        `;
+            </div>`;
     } else if (type === 'situation') {
         msgDiv.className = 'situ';
         msgDiv.innerHTML = `<div class="situ-mes"><div>"${content}"</div></div>`;
     }
 
-    // 2. 메시지가 쌓일 실제 타겟(div)을 찾습니다. 
-    // Django 템플릿 구조상 .char-room-message 안의 첫 번째 div일 확률이 높습니다.
-    const messageContentArea = container.querySelector('.char-room-message > div') || container;
-
-    // 3. 삽입 로직 변경: 그냥 appendChild로 맨 뒤에 붙이세요.
-    // 스크롤을 아래로 내리는 로직이 있으니 굳이 insertBefore를 쓸 필요가 없습니다.
-    messageContentArea.appendChild(msgDiv);
-
-    // 4. 스크롤 처리
+    container.appendChild(msgDiv);
     container.scrollTop = container.scrollHeight;
 }
-// ==========================
-// DOM 로드 이후
-// ==========================
+
 document.addEventListener('DOMContentLoaded', () => {
-    const personaSubmitBtn = document.getElementById('persona-submit-btn');;
+    const personaSubmitBtn = document.getElementById('persona-submit-btn');
     const sendBtn = document.getElementById('send-btn');
     const chatInput = document.getElementById('chat-input');
     const personaModal = document.getElementById('persona-modal');
+    const messageContainer = document.querySelector('.char-room-message > div');
+    const currentCount = document.getElementById('current-count');
 
     const userNickname = "{{ user.nickname }}";
-    const userImageUrl = "{{ user.img_url.url }}";
     const characterName = "{{ room.character.kor_name }}";
-    const charImageUrl = "{{ room.character.img_url.url }}";
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
     const DEFAULT_PERSONA = {
         personality: "모든 행동에 민감하게 반응하는 성격",
         identity: "farmer",
@@ -180,14 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         first_scene: "{{ room.persona.first_scene|escapejs }}"
     };
 
-    // ==========================
-    // 페르소나 모달 노출 조건
-    // ==========================
     const messageCount = Number("{{ messages|length }}");
-    const hasPersona = "{{ room.persona|default:'' }}";
-
-    console.log('messageCount:', messageCount);
-    console.log('hasPersona:', hasPersona);
     const isDefaultPersona =
         currentPersona.personality === DEFAULT_PERSONA.personality &&
         currentPersona.identity === DEFAULT_PERSONA.identity &&
@@ -198,9 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
         personaModal.style.display = 'flex';
     }
 
-       personaSubmitBtn.addEventListener('click', async () => {
+    // 페르소나 설정
+    personaSubmitBtn.addEventListener('click', async () => {
         const fd = new FormData();
-        fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        fd.append('csrfmiddlewaretoken', csrftoken);
         fd.append('personality', document.getElementById('p-personality').value);
         fd.append('identity', document.getElementById('p-identity').value);
         fd.append('values', document.getElementById('p-values').value);
@@ -214,49 +193,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
 
             if (data.status === 'success') {
-                location.href = `/${data.room_url}`;
+                personaModal.style.display = 'none';
+                appendMessage(messageContainer, 'situation', data.first_scene, '');
             }
         } catch (e) {
             console.error(e);
         }
     });
 
-    // ==========================
     // 메시지 전송
-    // ==========================
-// 1. 요소 선택 (null 체크를 위해 상단에 배치)
-    const messageContainer = document.querySelector('.char-room-message > div');
-    const currentCount = document.getElementById('current-count');
-
-    if (!messageContainer || !chatInput || !sendBtn) {
-        console.error("필수 DOM 요소를 찾을 수 없습니다.");
-        return;
-    }
-
-    // 2. 전송 로직
     sendBtn.addEventListener('click', async () => {
         const message = chatInput.value.trim();
         if (!message) return;
 
-        // 유저 메시지 즉시 렌더링
-        appendMessage(
-            messageContainer,
-            'user',
-            message,
-            typeof userNickname !== 'undefined' ? userNickname : '나',
-            typeof userImageUrl !== 'undefined' ? userImageUrl : ''
-        );
-
+        appendMessage(messageContainer, 'user', message, userNickname || '나');
         chatInput.value = '';
         currentCount.textContent = '0';
 
         try {
-            const csrfElement = document.querySelector('[name=csrfmiddlewaretoken]');
-            if (!csrfElement) throw new Error("CSRF 토큰을 찾을 수 없습니다.");
-            
-            const csrftoken = csrfElement.value;
-
-            // Django URL 템플릿 태그가 JS 안에서 정상 작동하는지 확인 (script 태그 내부여야 함)
             const response = await fetch("{% url 'characters:send_message' room.id %}", {
                 method: 'POST',
                 headers: {
@@ -270,13 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             if (data.status === 'success') {
-                appendMessage(
-                    messageContainer,
-                    'character',
-                    data.character_message.content,
-                    typeof characterName !== 'undefined' ? characterName : 'AI',
-                    typeof charImageUrl !== 'undefined' ? charImageUrl : ''
-                );
+                appendMessage(messageContainer, 'character', data.character_message.content, characterName || 'AI');
             }
         } catch (e) {
             console.error("전송 중 오류 발생:", e);
@@ -284,15 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 엔터키 처리
     chatInput.addEventListener('keypress', e => {
         if (e.key === 'Enter') {
-            e.preventDefault(); // 기본 줄바꿈 방지
+            e.preventDefault();
             sendBtn.click();
         }
     });
 
-    // 글자 수 카운트
     chatInput.addEventListener('input', () => {
         currentCount.textContent = chatInput.value.length;
     });
