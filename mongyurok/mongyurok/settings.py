@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['52.78.197.220', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -84,26 +84,26 @@ WSGI_APPLICATION = 'mongyurok.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'dream_db',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
+#         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': 'dream_db',
-#         'USER' : 'root',
-#         'PASSWORD' : os.getenv('LOCAL_RDSDB_PASSWORD'), 
-#         'HOST' : os.getenv('RDSDB_URL'),
-#         'PORT' : '3306',
-#         'OPTIONS': {
-#             'charset': 'utf8mb4',
-#         },
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dream_db',
+        'USER' : 'root',
+        'PASSWORD' : os.getenv('LOCAL_RDSDB_PASSWORD'), 
+        'HOST' : os.getenv('RDSDB_URL'),
+        'PORT' : '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+    }
+}
 
 
 # Password validation
@@ -142,11 +142,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATIC_ROOT = BASE_DIR / 'static'
 
-# CSRF_TRUSTED_ORIGINS = ["http://:8080"]
+CSRF_TRUSTED_ORIGINS = ["http://52.78.197.220:8080"]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

@@ -48,4 +48,11 @@
         </form>
     </div>
 </section>
+{% if error %}
+<script>
+    // 뷰에서 넘겨받은 error 메시지가 있을 때 alert창을 띄웁니다.
+    alert("{{ error|escapejs }}");
+</script>
+{% endif %}
 {% endblock %}
+
