@@ -84,26 +84,26 @@ WSGI_APPLICATION = 'mongyurok.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'dream_db',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
+#         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': 'dream_db',
-#         'USER' : 'root',
-#         'PASSWORD' : os.getenv('LOCAL_RDSDB_PASSWORD'), 
-#         'HOST' : os.getenv('RDSDB_URL'),
-#         'PORT' : '3306',
-#         'OPTIONS': {
-#             'charset': 'utf8mb4',
-#         },
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dream_db',
+        'USER' : 'root',
+        'PASSWORD' : os.getenv('LOCAL_RDSDB_PASSWORD'), 
+        'HOST' : os.getenv('RDSDB_URL'),
+        'PORT' : '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+    }
+}
 
 
 # Password validation
