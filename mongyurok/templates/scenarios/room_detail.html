@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}채팅방{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/scenarios/chat-room.css' %}">
+<style>
+    /* 모달 기본 스타일 */
+    .modal-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center;
+    }
+    .modal-content {
+        background: #fdfaf4; padding: 30px; border-radius: 12px; width: 450px; color: #333;
+    }
+    .modal-content input, .modal-content select, .modal-content textarea {
+        width: 100%; margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 1. 페르소나 설정 모달 -->
+<div id="persona-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2 style="text-align: center; margin-bottom: 20px;">페르소나 설정</h2>
+        <label>성격</label>
+        <input type="text" id="p-personality" placeholder="예: 모든 행동에 민감하게 반응하는 성격">
+        
+        <label>신분</label>
+        <select id="p-identity">
+            <option value="farmer">농부</option>
+            <option value="scholar">유생</option>
+            <option value="official">관료</option>
+            <option value="general">장수</option>
+            <option value="merchant">상인</option>
+            <option value="physician">의원</option>
+            <option value="eunuch">내관</option>
+        </select>
+
+        <label>가치관</label>
+        <textarea id="p-values" placeholder="예: 밥 먹는 것이 최고고 모든 문제는 밥으로 해결 가능하다." style="height: 80px;"></textarea>
+
+        <label>최초 상황</label>
+        <textarea id="p-scene" placeholder="예: 밥 먹다가 왕에게 갑자기 호출됐다." style="height: 80px;"></textarea>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="history.back()" style="flex: 1; padding: 12px; border: none; border-radius: 5px; cursor: pointer;">취소</button>
+            <button id="persona-submit-btn" style="flex: 2; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 5px; cursor: pointer;">적용하기</button>
+        </div>
+    </div>
+</div>
+
+<section class="char-room-group">
+    <!-- 1. 왼쪽: 메시지 영역 -->
+    <div class="char-room-message">
+        <div>
+            {% csrf_token %}
+            <div class="ai-notice">
+                <p>답변은 모두 AI가 생성한 내용이에요</p>
+            </div>
+
+            {% for msg in messages %}
+                {% if msg.type == "character" %}
+                    {% include 'characters/components/char-box.html' %}
+                {% elif msg.type == "scene" %}
+                    {% include 'characters/components/situ-box.html' %}
+                {% elif msg.type == "user" %}
+                    {% include 'characters/components/user-box.html' %}
+                {% endif %}
+            {% endfor %}
+            </div> 
+        </div>
+            <div class="input-wrapper">
+        <div class="input-container">
+            <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." maxlength="300">
+            <button id="send-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="black"/>
+                    <rect x="9" y="9" width="6" height="6" fill="white"/>
+                </svg>
+            </button>
+        </div>
+        <div class="char-count"><span id="current-count">0</span>/300자</div>
+    </div>
+</section>
+<script>
+// 메시지 렌더링 함수 (기존 로직 유지하되 안전성 강화)
+function appendMessage(container, type, content, nickname) {
+    const msgDiv = document.createElement('div');
+    
+    // type 처리 (백엔드 상수는 대문자일 수 있으므로 소문자 변환)
+    const lowerType = type.toLowerCase();
+
+    if (lowerType === 'user') {
+        msgDiv.className = 'user-box-group';
+        msgDiv.innerHTML = `
+            <div class="user-box-mes">
+                <p class="user-nickname">${nickname}</p>
+                <div class="user-bubble">${content}</div>
+            </div>
+        `;
+    } else if (lowerType === 'character') {
+        msgDiv.className = 'char-box-group';
+        msgDiv.innerHTML = `
+
+            <div class="char-box-mes">
+                <p class="char-nickname">${nickname}</p>
+                <div class="char-bubble">${content}</div>
+            </div>
+        `;
+    } else if (lowerType === 'scene' || lowerType === 'situation') {
+        msgDiv.className = 'situ';
+        msgDiv.innerHTML = `<div class="situ-mes"><div>"${content}"</div></div>`;
+    }
+
+    const messageContentArea = container.querySelector('.char-room-message > div') || container;
+    messageContentArea.appendChild(msgDiv);
+
+    // 스크롤 하단 이동
+    container.scrollTop = container.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const personaSubmitBtn = document.getElementById('persona-submit-btn');
+    const sendBtn = document.getElementById('send-btn');
+    const chatInput = document.getElementById('chat-input');
+    const personaModal = document.getElementById('persona-modal');
+    const messageContainer = document.querySelector('.char-room-message');
+    const currentCount = document.getElementById('current-count');
+
+    const userNickname = "{{ user.nickname }}";
+    const userImageUrl = "{{ user.img_url.url }}";
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // 1. 페르소나 설정 제출 로직 수정
+    personaSubmitBtn.addEventListener('click', async () => {
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', csrftoken);
+        formData.append('personality', document.getElementById('p-personality').value);
+        formData.append('identity', document.getElementById('p-identity').value);
+        formData.append('values', document.getElementById('p-values').value);
+        formData.append('first_scene', document.getElementById('p-scene').value);
+
+        try {
+            // URL은 setup_persona를 가리켜야 함
+            const response = await fetch("{% url 'scenarios:setup_persona' room.id %}", {
+                method: 'POST',
+                body: formData // FormData로 전송 (백엔드의 request.POST와 호환)
+            });
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                location.reload(); // 첫 상황 메시지 생성을 위해 새로고침
+            } else {
+                alert(data.message);
+            }
+        } catch (e) {
+            console.error("페르소나 설정 오류:", e);
+        }
+    });
+
+    // 2. 메시지 전송 로직 수정
+    sendBtn.addEventListener('click', async () => {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        
+
+        // 유저 메시지 즉시 렌더링
+        appendMessage(
+            messageContainer,
+            'user',
+            message,
+            userNickname || '나',
+        );
+
+        chatInput.value = '';
+        currentCount.textContent = '0';
+
+                // 백엔드는 'content'라는 키로 메시지를 기다림
+            const response = await fetch("{% url 'scenarios:send_chat' room.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: new URLSearchParams({ 'content': message }) // 키를 'content'로 변경
+            });
+
+            if (!response.ok) throw new Error("서버 응답 오류");
+
+            const data = await response.json();
+            console.log(data)
+            
+                    console.log(data); // 브라우저 콘솔에서 데이터가 들어오는지 꼭 확인하세요!
+
+                    // 1. data.replies 대신 data.new_messages를 써야 합니다.
+                    if (data.status === 'success' && Array.isArray(data.new_messages)) {
+                        data.new_messages.forEach(msg => {
+                            appendMessage(
+                                messageContainer,
+                                msg.type,          // View의 final_type ("character" 또는 "scene")
+                                msg.content,       // 메시지 내용
+                                msg.char_name || '', // 캐릭터 이름
+                            );
+                        });
+                        
+                        // 메시지 추가 후 스크롤 하단 이동 (선택사항이지만 추천!)
+                        messageContainer.scrollTop = messageContainer.scrollHeight;
+                    }
+                });
+
+    // 엔터키 및 글자수 카운트 (기존 동일)
+    chatInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendBtn.click();
+        }
+    });
+
+    chatInput.addEventListener('input', () => {
+        currentCount.textContent = chatInput.value.length;
+    });
+});
+</script>
+{% endblock %}

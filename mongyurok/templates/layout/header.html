@@ -6,7 +6,7 @@
             <a href="{% url 'characters:main' %}"
                class="nav-link {% if request.resolver_match.view_name == 'characters:main' %}active{% endif %}">독대 모드</a>
             <a href="{% url 'scenarios:main_scenarios' %}"
-               class="nav-link {% if request.resolver_match.view_name == 'scenarios:main_scenarios' %}active{% endif %}">스토리 모드</a>
+               class="nav-link {% if request.resolver_match.view_name == 'scenarios:main_scenarios' %}active{% endif %}">역할극 모드</a>
             <a href="{% url 'images:imgs' %}"
                 class="nav-link {% if request.resolver_match.view_name == 'images:imgs' %}active{% endif %}">이미지</a>
         </nav>

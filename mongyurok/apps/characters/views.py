@@ -100,7 +100,7 @@ def persona_setting(request, character_id):
         "status": "success",
         "message": "페르소나가 설정되었습니다.",
         "room_id": room.id,
-        "room_url": f"/chats/rooms/{room.id}/",
+        "room_url": f"rooms/{room.id}/",
         "first_scene": final_first_scene
     })
 
@@ -122,7 +122,7 @@ def char_room(request, room_id):
 
     messages = room.messages.all()
 
-    return render(request, "chats/char_room.html", {
+    return render(request, "characters/chat_room.html", {
         "room": room,
         "messages": messages
     })
