@@ -134,6 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const userImageUrl = "{{ user.img_url.url }}";
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
+    const isPersonaRequired = {{ is_persona_required|yesno:"true,false" }};
+    if (isPersonaRequired) {
+        personaModal.style.display = 'flex';
+    }
+
     // 1. 페르소나 설정 제출 로직 수정
     personaSubmitBtn.addEventListener('click', async () => {
         const formData = new FormData();
